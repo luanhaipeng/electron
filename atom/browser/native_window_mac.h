@@ -87,6 +87,7 @@ class NativeWindowMac : public NativeWindow,
   bool IsDocumentEdited() override;
   void SetIgnoreMouseEvents(bool ignore) override;
   void SetContentProtection(bool enable) override;
+  void SetContentsView(NativeView* contents_view) override;
   void SetParentWindow(NativeWindow* parent) override;
   gfx::NativeWindow GetNativeWindow() override;
   gfx::AcceleratedWidget GetAcceleratedWidget() override;
@@ -162,6 +163,9 @@ class NativeWindowMac : public NativeWindow,
 
   // The view that will fill the whole frameless window.
   base::scoped_nsobject<FullSizeContentView> content_view_;
+
+  // Kept alive by api::Window.
+  NSView* contents_view_;
 
   std::vector<DraggableRegion> draggable_regions_;
 

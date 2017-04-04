@@ -7,6 +7,7 @@
 #include <Quartz/Quartz.h>
 #include <string>
 
+#include "atom/browser/native_view_mac.h"
 #include "atom/browser/ui/cocoa/atom_touch_bar.h"
 #include "atom/browser/window_list.h"
 #include "atom/common/color_util.h"
@@ -665,6 +666,7 @@ NativeWindowMac::NativeWindowMac(
     const mate::Dictionary& options,
     NativeWindow* parent)
     : NativeWindow(web_contents, options, parent),
+      contents_view_(),
       is_kiosk_(false),
       was_fullscreen_(false),
       zoom_to_page_width_(false),
@@ -1261,6 +1263,25 @@ void NativeWindowMac::SetIgnoreMouseEvents(bool ignore) {
 void NativeWindowMac::SetContentProtection(bool enable) {
   [window_ setSharingType:enable ? NSWindowSharingNone
                                  : NSWindowSharingReadOnly];
+}
+
+void NativeWindowMac::SetContentsView(NativeView* contents_view) {
+  NSView* view = [window_ contentView];
+
+  if (contents_view_ && contents_view_.superview == view) {
+    [contents_view_ removeFromSuperview];
+    contents_view_ = nullptr;
+  }
+
+  if (!contents_view) {
+    return;
+  }
+
+  contents_view_ = contents_view->GetView();
+  [view addSubview:contents_view_ positioned:NSWindowAbove relativeTo:nil];
+  [contents_view_ setFrame:view.frame];
+  [contents_view_ setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable];
+  [contents_view_ setHidden:NO];
 }
 
 void NativeWindowMac::SetParentWindow(NativeWindow* parent) {

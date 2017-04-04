@@ -36,6 +36,7 @@ class NativeWindow;
 
 namespace api {
 
+class View;
 class WebContents;
 
 class Window : public mate::TrackableObject<Window>,
@@ -180,6 +181,8 @@ class Window : public mate::TrackableObject<Window>,
   void SetParentWindow(v8::Local<v8::Value> value, mate::Arguments* args);
   v8::Local<v8::Value> GetParentWindow() const;
   std::vector<v8::Local<v8::Object>> GetChildWindows() const;
+  v8::Local<v8::Value> GetContentsView() const;
+  void SetContentsView(v8::Local<v8::Value> value);
   bool IsModal() const;
   v8::Local<v8::Value> GetNativeWindowHandle();
 
@@ -219,6 +222,7 @@ class Window : public mate::TrackableObject<Window>,
   MessageCallbackMap messages_callback_map_;
 #endif
 
+  v8::Global<v8::Value> contents_view_;
   v8::Global<v8::Value> web_contents_;
   v8::Global<v8::Value> menu_;
   v8::Global<v8::Value> parent_window_;

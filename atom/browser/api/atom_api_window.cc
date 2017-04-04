@@ -6,6 +6,7 @@
 #include "atom/common/native_mate_converters/value_converter.h"
 
 #include "atom/browser/api/atom_api_menu.h"
+#include "atom/browser/api/atom_api_view.h"
 #include "atom/browser/api/atom_api_web_contents.h"
 #include "atom/browser/browser.h"
 #include "atom/browser/native_window.h"
@@ -816,6 +817,25 @@ std::vector<v8::Local<v8::Object>> Window::GetChildWindows() const {
   return child_windows_.Values(isolate());
 }
 
+v8::Local<v8::Value> Window::GetContentsView() const {
+  if (contents_view_.IsEmpty()) {
+    return v8::Null(isolate());
+  }
+
+  return v8::Local<v8::Value>::New(isolate(), contents_view_);
+}
+
+void Window::SetContentsView(v8::Local<v8::Value> value) {
+  mate::Handle<View> view;
+  if (value->IsNull()) {
+    window_->SetContentsView(nullptr);
+    contents_view_.Reset();
+  } else if (mate::ConvertFromV8(isolate(), value, &view)) {
+    window_->SetContentsView(view->view());
+    contents_view_.Reset(isolate(), value);
+  }
+}
+
 bool Window::IsModal() const {
   return window_->is_modal();
 }
@@ -858,10 +878,11 @@ int32_t Window::ID() const {
 }
 
 v8::Local<v8::Value> Window::WebContents(v8::Isolate* isolate) {
-  if (web_contents_.IsEmpty())
+  if (web_contents_.IsEmpty()) {
     return v8::Null(isolate);
-  else
-    return v8::Local<v8::Value>::New(isolate, web_contents_);
+  }
+
+  return v8::Local<v8::Value>::New(isolate, web_contents_);
 }
 
 void Window::RemoveFromParentChildWindows() {
@@ -906,6 +927,8 @@ void Window::BuildPrototype(v8::Isolate* isolate,
 #endif
       .SetMethod("getParentWindow", &Window::GetParentWindow)
       .SetMethod("getChildWindows", &Window::GetChildWindows)
+      .SetMethod("getContentsView", &Window::GetContentsView)
+      .SetMethod("setContentsView", &Window::SetContentsView)
       .SetMethod("isModal", &Window::IsModal)
       .SetMethod("getNativeWindowHandle", &Window::GetNativeWindowHandle)
       .SetMethod("getBounds", &Window::GetBounds)

@@ -104,6 +104,7 @@ class NativeWindowViews : public NativeWindow,
   void SetContentProtection(bool enable) override;
   void SetFocusable(bool focusable) override;
   void SetMenu(AtomMenuModel* menu_model) override;
+  void SetContentsView(NativeView* contents_view) override;
   void SetParentWindow(NativeWindow* parent) override;
   gfx::NativeWindow GetNativeWindow() override;
   void SetOverlayIcon(const gfx::Image& overlay,
@@ -193,6 +194,9 @@ class NativeWindowViews : public NativeWindow,
   bool menu_bar_autohide_;
   bool menu_bar_visible_;
   bool menu_bar_alt_pressed_;
+
+  // Kept alive by api::Window.
+  views::View* contents_view_;
 
 #if defined(USE_X11)
   std::unique_ptr<GlobalMenuBarX11> global_menu_bar_;

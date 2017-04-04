@@ -138,6 +138,7 @@ NativeWindowViews::NativeWindowViews(
       menu_bar_autohide_(false),
       menu_bar_visible_(false),
       menu_bar_alt_pressed_(false),
+      contents_view_(),
 #if defined(OS_WIN)
       checked_for_a11y_support_(false),
       thick_frame_(true),
@@ -816,6 +817,21 @@ void NativeWindowViews::SetFocusable(bool focusable) {
   SetSkipTaskbar(!focusable);
   Focus(false);
 #endif
+}
+
+void NativeWindowMac::SetContentsView(NativeView* contents_view) {
+  if (contents_view_) {
+    RemoveChildView(contents_view_);
+    contents_view_ = nullptr;
+  }
+
+  if (!contents_view) {
+    return;
+  }
+
+  contents_view_ = contents_view->GetView();
+  AddChildView(contents_view_);
+  contents_view_->SetBoundsRect(GetBounds());
 }
 
 void NativeWindowViews::SetMenu(AtomMenuModel* menu_model) {

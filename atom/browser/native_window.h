@@ -47,6 +47,8 @@ class Dictionary;
 
 namespace atom {
 
+class NativeView;
+
 struct DraggableRegion;
 
 class NativeWindow : public base::SupportsUserData,
@@ -144,6 +146,7 @@ class NativeWindow : public base::SupportsUserData,
   virtual void SetFocusable(bool focusable);
   virtual void SetMenu(AtomMenuModel* menu);
   virtual void SetParentWindow(NativeWindow* parent);
+  virtual void SetContentsView(NativeView* contentsView) = 0;
   virtual gfx::NativeWindow GetNativeWindow() = 0;
   virtual gfx::AcceleratedWidget GetAcceleratedWidget() = 0;
 
@@ -331,6 +334,8 @@ class NativeWindow : public base::SupportsUserData,
 
   // The parent window, it is guaranteed to be valid during this window's life.
   NativeWindow* parent_;
+
+  NativeView* contents_view_;
 
   // Is this a modal window.
   bool is_modal_;
