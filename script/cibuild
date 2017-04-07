@@ -73,18 +73,18 @@ def main():
 
   is_release = os.environ.has_key('ELECTRON_RELEASE')
   args = ['--target_arch=' + target_arch]
-  if not is_release:
-    args += ['--dev']
+  # if not is_release:
+  #   args += ['--dev']
   run_script('bootstrap.py', args)
 
   if PLATFORM != 'win32':
     sys.stderr.write('\nRunning `npm run lint`\n')
     sys.stderr.flush()
     execute([npm, 'run', 'lint'])
-  if is_release:
+  if True:
     run_script('build.py', ['-c', 'R'])
     run_script('create-dist.py')
-    run_script('upload.py')
+    # run_script('upload.py')
   else:
     if PLATFORM == 'win32':
       os.environ['OUTPUT_TO_FILE'] = 'output.log'
