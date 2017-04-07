@@ -5,6 +5,7 @@
 #include "atom/browser/ui/win/atom_desktop_window_tree_host_win.h"
 
 #include "atom/browser/ui/win/message_handler_delegate.h"
+#include "ui/display/win/screen_win.h"
 
 namespace atom {
 
@@ -25,12 +26,22 @@ bool AtomDesktopWindowTreeHostWin::PreHandleMSG(
   return delegate_->PreHandleMSG(message, w_param, l_param, result);
 }
 
-/** Override the client area inset
- *  Returning true forces a border of 0 for frameless windows
- */
+bool AtomDesktopWindowTreeHostWin::HasNonClientView() const {
+  return !IsMaximized() || HasFrame();
+}
+
 bool AtomDesktopWindowTreeHostWin::GetClientAreaInsets(
     gfx::Insets* insets) const {
-  return !HasFrame();
+  if (!HasNonClientView()) {
+    const int x = display::win::ScreenWin::GetSystemMetricsForHwnd(
+        GetHWND(), SM_CXSIZEFRAME);
+    const int y = display::win::ScreenWin::GetSystemMetricsForHwnd(
+        GetHWND(), SM_CYSIZEFRAME);
+    *insets = gfx::Insets(y * 2, x * 2, y * 2, x * 2);
+    return true;
+  }
+
+  return false;
 }
 
 }  // namespace atom
